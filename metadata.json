@@ -1,0 +1,7 @@
+{
+  "uuid": "snippet-picker@jidaikobo.shibata",
+  "name": "Snippet Picker",
+  "description": "トップバーから固定ファイルのスニペットを選んでコピーし、可能なら貼り付けまで試みます。",
+  "shell-version": ["45", "46", "47", "48"],
+  "version": 1
+}

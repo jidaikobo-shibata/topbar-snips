@@ -1,0 +1,5 @@
+.codex-private/
+*.log
+*.swp
+*.swo
+*~
