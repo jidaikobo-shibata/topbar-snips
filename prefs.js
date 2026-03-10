@@ -94,6 +94,7 @@ function createKeybindingWidget(settings) {
 
 export default class SnippetPickerPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
+        const _ = this.gettext.bind(this);
         const settings = this.getSettings();
         const main = new Gtk.Box({
             orientation: Gtk.Orientation.VERTICAL,
@@ -105,7 +106,7 @@ export default class SnippetPickerPreferences extends ExtensionPreferences {
         });
 
         main.append(new Gtk.Label({
-            label: 'ショートカットでメニューを開き、検索して Enter で貼り付けできます。',
+            label: _('Open the menu with a shortcut, search, and press Enter to paste.'),
             wrap: true,
             xalign: 0,
         }));
@@ -115,27 +116,27 @@ export default class SnippetPickerPreferences extends ExtensionPreferences {
             keybinding.model,
             settings,
             KEYBINDING_TOGGLE_PICKER,
-            'スニペット選択メニューを開く'
+            _('Open the snippet picker')
         );
         main.append(keybinding.treeView);
 
         main.append(new Gtk.Label({
-            label: '上向き/下向きキーで候補を選び、Enter で確定します。',
+            label: _('Use the Up and Down keys to choose a snippet, then press Enter.'),
             wrap: true,
             xalign: 0,
         }));
 
         const keyboardGroup = new Adw.PreferencesGroup({
-            title: 'キーボード',
+            title: _('Keyboard'),
         });
         keyboardGroup.add(main);
 
         const behaviorGroup = new Adw.PreferencesGroup({
-            title: '動作',
+            title: _('Behavior'),
         });
         const copyRow = new Adw.SwitchRow({
-            title: '確定後もクリップボードに残す',
-            subtitle: 'OFF のときは貼り付け用に一時差し替えし、Ctrl+V 送出後に元へ戻します。',
+            title: _('Keep snippet in clipboard after activation'),
+            subtitle: _('When off, the clipboard is swapped temporarily for pasting and restored after Ctrl+V is sent.'),
         });
         settings.bind(
             KEY_KEEP_CLIPBOARD_CONTENT,
@@ -146,8 +147,8 @@ export default class SnippetPickerPreferences extends ExtensionPreferences {
         behaviorGroup.add(copyRow);
 
         const notificationRow = new Adw.SwitchRow({
-            title: '通知を表示する',
-            subtitle: 'コピー、貼り付け、削除、ファイル起動時の通知を表示します。',
+            title: _('Show notifications'),
+            subtitle: _('Show notifications for copy, paste, deletion, and file opening actions.'),
         });
         settings.bind(
             KEY_SHOW_NOTIFICATIONS,

@@ -11,6 +11,8 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
+let _ = text => text;
+
 const DEFAULT_SNIPPET_FILE_NAME = 'snippets.txt';
 const USER_SNIPPET_FILE_NAME = 'snippets.local.txt';
 const SNIPPET_MARKER = /^%%snippet(?::\s*(.+?))?%%\s*$/;
@@ -76,7 +78,7 @@ function parseSnippets(contents) {
 
         snippets.push({
             id: snippets.length,
-            title: currentTitle || `Snippet ${snippets.length + 1}`,
+            title: currentTitle || `${_('Snippet')} ${snippets.length + 1}`,
             markerTitle: currentTitle,
             body,
         });
@@ -144,7 +146,7 @@ function openSnippetFile(extensionPath) {
 
 class SnippetPickerIndicator extends PanelMenu.Button {
     _init(extension) {
-        super._init(0.0, 'Snippet Picker', false);
+        super._init(0.0, _('Snippet Picker'), false);
 
         this._extension = extension;
         this._pasteTimeoutId = null;
@@ -162,7 +164,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             style_class: 'panel-status-menu-box',
         });
         box.add_child(new St.Label({
-            text: 'Snip',
+            text: 'Snips',
             y_align: Clutter.ActorAlign.CENTER,
         }));
         box.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
@@ -216,8 +218,8 @@ class SnippetPickerIndicator extends PanelMenu.Button {
         } catch (error) {
             logError(error, 'Automatic paste failed');
             this._extension.notify(
-                'Snippet Picker',
-                '自動貼り付けに失敗しました。クリップボードにはコピー済みです。'
+                _('Snippet Picker'),
+                _('Automatic paste failed. The snippet is still in the clipboard.')
             );
             return false;
         }
@@ -248,10 +250,10 @@ class SnippetPickerIndicator extends PanelMenu.Button {
                 }
 
                 this._extension.notify(
-                    'Snippet Picker',
+                    _('Snippet Picker'),
                     keepClipboardContent
-                        ? `コピーしました: ${snippet.title}`
-                        : `貼り付けを試みます: ${snippet.title}`
+                        ? `${_('Copied')}: ${snippet.title}`
+                        : `${_('Trying to paste')}: ${snippet.title}`
                 );
 
                 this._pasteTimeoutId = GLib.timeout_add(
@@ -402,7 +404,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             name: 'snippet-picker-search-entry',
             style_class: 'search-entry',
             can_focus: true,
-            hint_text: 'スニペットを検索…',
+            hint_text: _('Search snippets...'),
             track_hover: true,
             x_expand: true,
             y_expand: true,
@@ -452,21 +454,24 @@ class SnippetPickerIndicator extends PanelMenu.Button {
 
             if (nextSnippets.length === snippets.length) {
                 this._extension.notify(
-                    'Snippet Picker',
-                    `削除対象が見つかりませんでした: ${snippet.title}`
+                    _('Snippet Picker'),
+                    `${_('Snippet not found for deletion')}: ${snippet.title}`
                 );
                 this._reloadMenu();
                 return;
             }
 
             saveSnippets(this._extension.path, nextSnippets);
-            this._extension.notify('Snippet Picker', `削除しました: ${snippet.title}`);
+            this._extension.notify(
+                _('Snippet Picker'),
+                `${_('Deleted')}: ${snippet.title}`
+            );
             this._reloadMenu();
         } catch (error) {
             logError(error, 'Failed to delete snippet');
             this._extension.notify(
-                'Snippet Picker',
-                `削除に失敗しました: ${snippet.title}`
+                _('Snippet Picker'),
+                `${_('Failed to delete')}: ${snippet.title}`
             );
         }
     }
@@ -478,7 +483,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        const deleteSection = new PopupMenu.PopupSubMenuMenuItem('削除…');
+        const deleteSection = new PopupMenu.PopupSubMenuMenuItem(_('Delete...'));
         this.menu.addMenuItem(deleteSection);
         this._auxiliaryItems.push(deleteSection);
 
@@ -494,23 +499,26 @@ class SnippetPickerIndicator extends PanelMenu.Button {
     _appendManageSection(snippetPath) {
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        const editItem = new PopupMenu.PopupMenuItem('snippets.txt を開く');
+        const editItem = new PopupMenu.PopupMenuItem(_('Open snippets.txt'));
         editItem.connect('activate', () => {
             try {
                 const openedPath = openSnippetFile(this._extension.path);
-                this._extension.notify('Snippet Picker', `開きました: ${openedPath}`);
+                this._extension.notify(
+                    _('Snippet Picker'),
+                    `${_('Opened')}: ${openedPath}`
+                );
             } catch (error) {
                 logError(error, 'Failed to open snippet file');
                 this._extension.notify(
-                    'Snippet Picker',
-                    `snippets.txt を開けませんでした: ${snippetPath}`
+                    _('Snippet Picker'),
+                    `${_('Failed to open snippets.txt')}: ${snippetPath}`
                 );
             }
         });
         this.menu.addMenuItem(editItem);
         this._auxiliaryItems.push(editItem);
 
-        const preferencesItem = new PopupMenu.PopupMenuItem('環境設定を開く');
+        const preferencesItem = new PopupMenu.PopupMenuItem(_('Open Preferences'));
         preferencesItem.connect('activate', () => {
             this.menu.close();
             this._extension.openPreferences();
@@ -531,7 +539,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             ({snippets} = loadSnippets(this._extension.path));
         } catch (error) {
             logError(error, 'Failed to load snippets');
-            this._appendMessageItem('スニペットファイルを読めませんでした');
+            this._appendMessageItem(_('Failed to read the snippet file.'));
             this._appendManageSection(snippetPath);
             return;
         }
@@ -542,13 +550,13 @@ class SnippetPickerIndicator extends PanelMenu.Button {
         this._setSelectedSnippetIndex(this._selectedSnippetIndex);
 
         if (snippets.length === 0) {
-            this._appendMessageItem('候補がありません');
+            this._appendMessageItem(_('No snippets available.'));
             this._appendManageSection(snippetPath);
             return;
         }
 
         if (this._filteredSnippets.length === 0) {
-            this._appendMessageItem('該当する候補がありません');
+            this._appendMessageItem(_('No matching snippets.'));
             this._appendDeleteSection(snippets);
             this._appendManageSection(snippetPath);
             return;
@@ -622,6 +630,7 @@ export default class SnippetPickerExtension extends Extension {
     }
 
     enable() {
+        _ = this.gettext.bind(this);
         this._settings = this.getSettings();
         this._indicator = createIndicator(this);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
@@ -657,5 +666,6 @@ export default class SnippetPickerExtension extends Extension {
         this._indicator?.destroy();
         this._indicator = null;
         this._settings = null;
+        _ = text => text;
     }
 }

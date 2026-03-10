@@ -1,0 +1,119 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: snippet-picker\n"
+"POT-Creation-Date: 2026-03-10 22:30+0900\n"
+"PO-Revision-Date: 2026-03-10 22:30+0900\n"
+"Last-Translator: Codex\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Snippet"
+msgstr "スニペット"
+
+msgid "Snippet Picker"
+msgstr "スニペットピッカー"
+
+msgid "Pick snippets from a file in the top bar, copy them, and try to paste automatically when possible."
+msgstr "トップバーからファイル内のスニペットを選び、コピーし、可能なら自動貼り付けを試みます。"
+
+msgid "Snip"
+msgstr "切貼"
+
+msgid "Automatic paste failed. The snippet is still in the clipboard."
+msgstr "自動貼り付けに失敗しました。スニペットはクリップボードに残っています。"
+
+msgid "Copied"
+msgstr "コピーしました"
+
+msgid "Trying to paste"
+msgstr "貼り付けを試行中"
+
+msgid "Search snippets..."
+msgstr "スニペットを検索..."
+
+msgid "Snippet not found for deletion"
+msgstr "削除対象のスニペットが見つかりません"
+
+msgid "Deleted"
+msgstr "削除しました"
+
+msgid "Failed to delete"
+msgstr "削除に失敗しました"
+
+msgid "Delete..."
+msgstr "削除..."
+
+msgid "Open snippets.txt"
+msgstr "snippets.txt を開く"
+
+msgid "Opened"
+msgstr "開きました"
+
+msgid "Failed to open snippets.txt"
+msgstr "snippets.txt を開けませんでした"
+
+msgid "Open Preferences"
+msgstr "環境設定を開く"
+
+msgid "Failed to read the snippet file."
+msgstr "スニペットファイルを読み込めませんでした。"
+
+msgid "No snippets available."
+msgstr "利用できるスニペットがありません。"
+
+msgid "No matching snippets."
+msgstr "一致するスニペットがありません。"
+
+msgid "Open the menu with a shortcut, search, and press Enter to paste."
+msgstr "ショートカットでメニューを開き、検索して Enter で貼り付けます。"
+
+msgid "Open the snippet picker"
+msgstr "スニペットピッカーを開く"
+
+msgid "Use the Up and Down keys to choose a snippet, then press Enter."
+msgstr "上下キーでスニペットを選び、Enter を押します。"
+
+msgid "Keyboard"
+msgstr "キーボード"
+
+msgid "Behavior"
+msgstr "動作"
+
+msgid "Keep snippet in clipboard after activation"
+msgstr "確定後もスニペットをクリップボードに残す"
+
+msgid "When off, the clipboard is swapped temporarily for pasting and restored after Ctrl+V is sent."
+msgstr "オフのときは貼り付けのために一時的にクリップボードを差し替え、Ctrl+V 送出後に元へ戻します。"
+
+msgid "Show notifications"
+msgstr "通知を表示する"
+
+msgid "Show notifications for copy, paste, deletion, and file opening actions."
+msgstr "コピー、貼り付け、削除、ファイルを開く操作で通知を表示します。"
+
+msgid "Shortcut to open the snippet picker"
+msgstr "スニペットピッカーを開くショートカット"
+
+msgid ""
+"Keyboard accelerator used to open the snippet picker and focus the\n"
+"search field."
+msgstr ""
+"スニペットピッカーを開き、検索欄へフォーカスするための\n"
+"キーボードショートカットです。"
+
+msgid "Whether activating a snippet should keep the snippet text in the clipboard after attempting automatic paste."
+msgstr "スニペット確定時に自動貼り付けを試したあと、その本文をクリップボードに残すかどうかです。"
+
+msgid "Show notifications for snippet actions"
+msgstr "スニペット操作の通知を表示する"
+
+msgid ""
+"Whether snippet activation, deletion, file opening, and paste failure\n"
+"should show desktop notifications."
+msgstr ""
+"スニペットの確定、削除、ファイルを開く操作、自動貼り付け失敗時に\n"
+"デスクトップ通知を表示するかどうかです。"
