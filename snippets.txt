@@ -1,8 +1,8 @@
-%%snippet: apt update & upgrade%%
-sudo apt update && sudo apt upgrade
+%%snippet: Quick brown fox%%
+The quick brown fox jumps over the lazy dog.
 
-%%snippet: reboot%%
-reboot
+%%snippet: uname -a%%
+uname -a
 
 %%snippet: Markdown code block%%
 ```
