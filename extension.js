@@ -326,8 +326,9 @@ class TopbarSnipsIndicator extends PanelMenu.Button {
 
                 global.stage.set_key_focus(this._searchEntry);
                 const clutterText = this._searchEntry.get_clutter_text();
-                clutterText.set_cursor_position(-1);
-                clutterText.set_selection(0, 0);
+                const textLength = this._searchEntry.get_text().length;
+                clutterText.set_cursor_position(textLength);
+                clutterText.set_selection_bound(textLength);
 
                 return GLib.SOURCE_REMOVE;
             }
