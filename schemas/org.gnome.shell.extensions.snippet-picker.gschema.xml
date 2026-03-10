@@ -18,5 +18,13 @@
         clipboard after attempting automatic paste.
       </description>
     </key>
+    <key name="show-notifications" type="b">
+      <default>false</default>
+      <summary>Show notifications for snippet actions</summary>
+      <description>
+        Whether snippet activation, deletion, file opening, and paste failure
+        should show desktop notifications.
+      </description>
+    </key>
   </schema>
 </schemalist>

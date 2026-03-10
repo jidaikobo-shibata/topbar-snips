@@ -18,6 +18,7 @@ const PASTE_DELAY_MS = 120;
 const CLIPBOARD_RESTORE_DELAY_MS = 80;
 const KEYBINDING_TOGGLE_PICKER = 'toggle-picker';
 const KEY_KEEP_CLIPBOARD_CONTENT = 'copy-on-activate';
+const KEY_SHOW_NOTIFICATIONS = 'show-notifications';
 
 function buildDefaultSnippetFilePath(extensionPath) {
     return GLib.build_filenamev([extensionPath, DEFAULT_SNIPPET_FILE_NAME]);
@@ -214,7 +215,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             return true;
         } catch (error) {
             logError(error, 'Automatic paste failed');
-            Main.notify(
+            this._extension.notify(
                 'Snippet Picker',
                 '自動貼り付けに失敗しました。クリップボードにはコピー済みです。'
             );
@@ -246,7 +247,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
                     this._clipboardRestoreTimeoutId = null;
                 }
 
-                Main.notify(
+                this._extension.notify(
                     'Snippet Picker',
                     keepClipboardContent
                         ? `コピーしました: ${snippet.title}`
@@ -450,7 +451,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             );
 
             if (nextSnippets.length === snippets.length) {
-                Main.notify(
+                this._extension.notify(
                     'Snippet Picker',
                     `削除対象が見つかりませんでした: ${snippet.title}`
                 );
@@ -459,11 +460,11 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             }
 
             saveSnippets(this._extension.path, nextSnippets);
-            Main.notify('Snippet Picker', `削除しました: ${snippet.title}`);
+            this._extension.notify('Snippet Picker', `削除しました: ${snippet.title}`);
             this._reloadMenu();
         } catch (error) {
             logError(error, 'Failed to delete snippet');
-            Main.notify(
+            this._extension.notify(
                 'Snippet Picker',
                 `削除に失敗しました: ${snippet.title}`
             );
@@ -497,10 +498,10 @@ class SnippetPickerIndicator extends PanelMenu.Button {
         editItem.connect('activate', () => {
             try {
                 const openedPath = openSnippetFile(this._extension.path);
-                Main.notify('Snippet Picker', `開きました: ${openedPath}`);
+                this._extension.notify('Snippet Picker', `開きました: ${openedPath}`);
             } catch (error) {
                 logError(error, 'Failed to open snippet file');
-                Main.notify(
+                this._extension.notify(
                     'Snippet Picker',
                     `snippets.txt を開けませんでした: ${snippetPath}`
                 );
@@ -606,6 +607,18 @@ function createIndicator(extension) {
 export default class SnippetPickerExtension extends Extension {
     shouldKeepClipboardContent() {
         return this._settings?.get_boolean(KEY_KEEP_CLIPBOARD_CONTENT) ?? false;
+    }
+
+    shouldShowNotifications() {
+        return this._settings?.get_boolean(KEY_SHOW_NOTIFICATIONS) ?? false;
+    }
+
+    notify(title, message) {
+        if (!this.shouldShowNotifications()) {
+            return;
+        }
+
+        Main.notify(title, message);
     }
 
     enable() {

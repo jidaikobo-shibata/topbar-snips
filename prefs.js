@@ -11,6 +11,7 @@ const COLUMN_KEY = 2;
 const COLUMN_MODS = 3;
 const KEYBINDING_TOGGLE_PICKER = 'toggle-picker';
 const KEY_KEEP_CLIPBOARD_CONTENT = 'copy-on-activate';
+const KEY_SHOW_NOTIFICATIONS = 'show-notifications';
 
 function addKeybinding(model, settings, id, description) {
     const accelerators = settings.get_strv(id);
@@ -143,6 +144,18 @@ export default class SnippetPickerPreferences extends ExtensionPreferences {
             Gio.SettingsBindFlags.DEFAULT
         );
         behaviorGroup.add(copyRow);
+
+        const notificationRow = new Adw.SwitchRow({
+            title: '通知を表示する',
+            subtitle: 'コピー、貼り付け、削除、ファイル起動時の通知を表示します。',
+        });
+        settings.bind(
+            KEY_SHOW_NOTIFICATIONS,
+            notificationRow,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT
+        );
+        behaviorGroup.add(notificationRow);
 
         const page = new Adw.PreferencesPage();
         page.add(keyboardGroup);
