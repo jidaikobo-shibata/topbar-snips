@@ -1,6 +1,7 @@
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GObject from 'gi://GObject';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -64,23 +65,84 @@ function parseSnippets(contents) {
 }
 
 class SnippetPickerIndicator extends PanelMenu.Button {
-    constructor(extension) {
-        super(0.0, 'Snippet Picker', false);
+    _init(extension) {
+        super._init(0.0, 'Snippet Picker', false);
 
         this._extension = extension;
         this._pasteTimeoutId = null;
 
-        const label = new St.Label({
+        const box = new St.BoxLayout({
+            style_class: 'panel-status-menu-box',
+        });
+        box.add_child(new St.Label({
             text: 'Snip',
             y_align: Clutter.ActorAlign.CENTER,
-        });
-        this.add_child(label);
+        }));
+        box.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
+        this.add_child(box);
 
         this.menu.connect('open-state-changed', (_menu, isOpen) => {
             if (isOpen) {
                 this._reloadMenu();
             }
         });
+
+        this._reloadMenu();
+    }
+
+    _appendMessageItem(message) {
+        const item = new PopupMenu.PopupMenuItem(message, {
+            reactive: false,
+            can_focus: false,
+        });
+        this.menu.addMenuItem(item);
+    }
+
+    _tryPaste() {
+        try {
+            const seat = Clutter.get_default_backend().get_default_seat();
+            const keyboard = seat.create_virtual_device(
+                Clutter.InputDeviceType.KEYBOARD_DEVICE
+            );
+            const timestamp = Clutter.get_current_event_time();
+
+            keyboard.notify_keyval(timestamp, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
+            keyboard.notify_keyval(timestamp, Clutter.KEY_v, Clutter.KeyState.PRESSED);
+            keyboard.notify_keyval(timestamp, Clutter.KEY_v, Clutter.KeyState.RELEASED);
+            keyboard.notify_keyval(timestamp, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
+        } catch (error) {
+            logError(error, 'Automatic paste failed');
+            Main.notify(
+                'Snippet Picker',
+                '自動貼り付けに失敗しました。クリップボードにはコピー済みです。'
+            );
+        }
+    }
+
+    _copyAndPaste(snippet) {
+        St.Clipboard.get_default().set_text(
+            St.ClipboardType.CLIPBOARD,
+            snippet.body
+        );
+
+        this.menu.close();
+
+        if (this._pasteTimeoutId !== null) {
+            GLib.Source.remove(this._pasteTimeoutId);
+            this._pasteTimeoutId = null;
+        }
+
+        Main.notify('Snippet Picker', `コピーしました: ${snippet.title}`);
+
+        this._pasteTimeoutId = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            PASTE_DELAY_MS,
+            () => {
+                this._pasteTimeoutId = null;
+                this._tryPaste();
+                return GLib.SOURCE_REMOVE;
+            }
+        );
     }
 
     _reloadMenu() {
@@ -113,62 +175,9 @@ class SnippetPickerIndicator extends PanelMenu.Button {
         }
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-        this._appendMessageItem(`ファイル: ${buildSnippetFilePath(this._extension.path)}`);
-    }
-
-    _appendMessageItem(message) {
-        const item = new PopupMenu.PopupMenuItem(message, {
-            reactive: false,
-            can_focus: false,
-        });
-        this.menu.addMenuItem(item);
-    }
-
-    _copyAndPaste(snippet) {
-        St.Clipboard.get_default().set_text(
-            St.ClipboardType.CLIPBOARD,
-            snippet.body
+        this._appendMessageItem(
+            `ファイル: ${buildSnippetFilePath(this._extension.path)}`
         );
-
-        this.menu.close();
-
-        if (this._pasteTimeoutId !== null) {
-            GLib.Source.remove(this._pasteTimeoutId);
-            this._pasteTimeoutId = null;
-        }
-
-        Main.notify('Snippet Picker', `コピーしました: ${snippet.title}`);
-
-        this._pasteTimeoutId = GLib.timeout_add(
-            GLib.PRIORITY_DEFAULT,
-            PASTE_DELAY_MS,
-            () => {
-                this._pasteTimeoutId = null;
-                this._tryPaste();
-                return GLib.SOURCE_REMOVE;
-            }
-        );
-    }
-
-    _tryPaste() {
-        try {
-            const seat = Clutter.get_default_backend().get_default_seat();
-            const keyboard = seat.create_virtual_device(
-                Clutter.InputDeviceType.KEYBOARD_DEVICE
-            );
-            const timestamp = Clutter.get_current_event_time();
-
-            keyboard.notify_keyval(timestamp, Clutter.KEY_Control_L, Clutter.KeyState.PRESSED);
-            keyboard.notify_keyval(timestamp, Clutter.KEY_v, Clutter.KeyState.PRESSED);
-            keyboard.notify_keyval(timestamp, Clutter.KEY_v, Clutter.KeyState.RELEASED);
-            keyboard.notify_keyval(timestamp, Clutter.KEY_Control_L, Clutter.KeyState.RELEASED);
-        } catch (error) {
-            logError(error, 'Automatic paste failed');
-            Main.notify(
-                'Snippet Picker',
-                '自動貼り付けに失敗しました。クリップボードにはコピー済みです。'
-            );
-        }
     }
 
     destroy() {
@@ -181,13 +190,24 @@ class SnippetPickerIndicator extends PanelMenu.Button {
     }
 }
 
+const SnippetPickerIndicatorObj = GObject.registerClass(SnippetPickerIndicator);
+
+function createIndicator(extension) {
+    return new SnippetPickerIndicatorObj(extension);
+}
+
 export default class SnippetPickerExtension extends Extension {
     enable() {
-        this._indicator = new SnippetPickerIndicator(this);
+        this._indicator = createIndicator(this);
         Main.panel.addToStatusArea(this.uuid, this._indicator);
     }
 
     disable() {
+        if (this._indicator?._pasteTimeoutId !== null) {
+            GLib.Source.remove(this._indicator._pasteTimeoutId);
+            this._indicator._pasteTimeoutId = null;
+        }
+
         this._indicator?.destroy();
         this._indicator = null;
     }

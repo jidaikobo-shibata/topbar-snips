@@ -19,3 +19,64 @@
   - `gnome-extensions enable snippet-picker@jidaikobo.shibata` で有効化して挙動確認する。
   - その前に Wayland セッションをログアウト・ログインして、拡張一覧に現れることを確認する。
   - 必要なら固定ファイルパスを設定画面へ切り出す。
+
+- 何をしたか
+  - GNOME Shell のログを確認し、`snippet-picker@jidaikobo.shibata` の有効化失敗原因を特定した。
+  - `extension.js` で `PanelMenu.Button` を継承するクラスを `GObject.registerClass(...)` で登録する形へ直した。
+  - さらに `constructor()` を `_init()` に置き換え、`super._init(...)` を使う形へ修正した。
+  - ローカルで動作している `clipboard-history` 拡張の実装と比較し、`class` 定義と `const Registered = GObject.registerClass(ClassName)` を分ける形へ揃えた。
+- なぜそうしたか
+  - GNOME Shell 46.0 では、この種の UI クラスを未登録のまま生成すると `Tried to construct an object without a GType` で読み込み失敗するため。
+  - `GObject.registerClass(...)` を使うクラスでも、GObject 系の継承では通常の `constructor()` ではなく `_init()` を実装する必要があるため。
+  - 既存の正常動作する拡張に合わせることで、GNOME Shell 46 のクラス登録まわりの差異を最小化できるため。
+- 未完了の事項
+  - 修正後に拡張がパネルへ表示されるかの再確認。
+  - スニペット選択時のコピーと自動貼り付けの動作確認。
+- 次にやるとよいこと
+  - 拡張を一度無効化してから再度有効化し、右上パネルへ `Snip` が出るか確認する。
+  - まだバツが出る場合は `journalctl --user -b --no-pager | rg snippet-picker` で新しいエラーを確認する。
+
+- 何をしたか
+  - `gnome-extensions info` で `有効: はい / 状態: ERROR` を確認した。
+  - セッション DBus の `org.gnome.Shell.Extensions.GetExtensionInfo` から詳細状態を取得した。
+  - 現在の `error` フィールドが `Error: Tried to construct an object without a GType` のままであることを確認した。
+- なぜそうしたか
+  - `journalctl` に新しいログが出ない状態でも、GNOME Shell 拡張管理が保持している直近の失敗理由を確認するため。
+  - 現在のソースコードと一致しない古いエラーが残っているかどうかを判定するため。
+- 未完了の事項
+  - 再ログイン後に GNOME Shell が修正済みコードを読み直すかの確認。
+  - 再ログイン後の `GetExtensionInfo` / `gnome-extensions info` で `ERROR` が解消するかの確認。
+- 次にやるとよいこと
+  - ログアウトして再ログインする。
+  - ログイン後に `gnome-extensions enable snippet-picker@jidaikobo.shibata` を実行する。
+  - 続けて `gnome-extensions info snippet-picker@jidaikobo.shibata` を確認し、`状態` が `ERROR` のままかを見る。
+  - まだ `ERROR` なら、再度 `GetExtensionInfo` を取得して新しい `error` メッセージを確認する。
+
+- 何をしたか
+  - 再ログイン後に `Snip` がトップバーへ表示されることを確認し、拡張のロード自体は成功していると判断した。
+  - その一方でクリックしてもメニューが開かない症状を受け、`extension.js` で初期化時にも `_reloadMenu()` を呼ぶようにした。
+  - トップバー上でメニュー付きボタンだと分かりやすくするため、ラベルの横に下向き矢印を追加した。
+- なぜそうしたか
+  - DBus 上の拡張状態では `enabled: true` かつ `error: ''` で、ロード失敗ではなくメニュー構築タイミングの問題が濃厚だったため。
+  - メニュー内容を「開いた後」にだけ組み立てるより、初期化時点で最低限の項目を持たせたほうが `PanelMenu.Button` として安定しやすいため。
+  - 矢印がないと、ラベル表示だけでは押下可能なメニューであることが分かりにくいため。
+- 未完了の事項
+  - 修正後に `Snip` のクリックでメニューが開くかの再確認。
+  - 項目選択時のコピーと自動貼り付けの確認。
+- 次にやるとよいこと
+  - 拡張を無効化してから再度有効化するか、必要なら再ログインして、メニューが開くか確認する。
+  - まだ開かない場合は、クリック直後の `journalctl --user -b --no-pager | rg "snippet-picker|Failed to load snippets|TypeError|ReferenceError"` を確認する。
+
+- 何をしたか
+  - トップバーの `Snip` を開けることを確認した。
+  - スニペット選択後にクリップボード経由で `Ctrl + V` による貼り付けができることを確認した。
+  - 当初の最小スコープである「固定ファイルから候補を出し、選んだ内容をすぐ貼れる」状態に到達したと判断した。
+- なぜそうしたか
+  - 目標としていた最小価値は、トップバーから即座にスニペットを呼び出して貼り付けられることだったため。
+  - 設定画面や検索などの追加機能がなくても、日常利用できる最小構成として成立しているため。
+- 未完了の事項
+  - 設定画面、検索 UI、ファイルパス変更、エラーメッセージ改善などの拡張余地がある。
+  - 自動貼り付けまわりは環境差があるため、Wayland/X11 の追加確認余地がある。
+- 次にやるとよいこと
+  - MVP 到達版としてコミットし、必要なら次の改善項目を別タスクで切り出す。
+  - 今後は設定可能なスニペットファイルパスや検索機能の優先度を決める。
