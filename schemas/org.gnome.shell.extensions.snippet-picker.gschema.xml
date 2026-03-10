@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.snippet-picker"
+          path="/org/gnome/shell/extensions/snippet-picker/">
+    <key name="toggle-picker" type="as">
+      <default>[]</default>
+      <summary>Shortcut to open the snippet picker</summary>
+      <description>
+        Keyboard accelerator used to open the snippet picker and focus the
+        search field.
+      </description>
+    </key>
+    <key name="copy-on-activate" type="b">
+      <default>false</default>
+      <summary>Keep snippet in clipboard after activation</summary>
+      <description>
+        Whether activating a snippet should keep the snippet text in the
+        clipboard after attempting automatic paste.
+      </description>
+    </key>
+  </schema>
+</schemalist>

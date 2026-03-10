@@ -3,3 +3,5 @@
 *.swp
 *.swo
 *~
+schemas/gschemas.compiled
+snippets.local.txt
