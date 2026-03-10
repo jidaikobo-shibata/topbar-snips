@@ -146,7 +146,7 @@ function openSnippetFile(extensionPath) {
 
 class SnippetPickerIndicator extends PanelMenu.Button {
     _init(extension) {
-        super._init(0.0, _('Snippet Picker'), false);
+        super._init(0.0, _('Topbar Snips'), false);
 
         this._extension = extension;
         this._pasteTimeoutId = null;
@@ -218,7 +218,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
         } catch (error) {
             logError(error, 'Automatic paste failed');
             this._extension.notify(
-                _('Snippet Picker'),
+                _('Topbar Snips'),
                 _('Automatic paste failed. The snippet is still in the clipboard.')
             );
             return false;
@@ -250,7 +250,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
                 }
 
                 this._extension.notify(
-                    _('Snippet Picker'),
+                    _('Topbar Snips'),
                     keepClipboardContent
                         ? `${_('Copied')}: ${snippet.title}`
                         : `${_('Trying to paste')}: ${snippet.title}`
@@ -454,7 +454,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
 
             if (nextSnippets.length === snippets.length) {
                 this._extension.notify(
-                    _('Snippet Picker'),
+                    _('Topbar Snips'),
                     `${_('Snippet not found for deletion')}: ${snippet.title}`
                 );
                 this._reloadMenu();
@@ -463,14 +463,14 @@ class SnippetPickerIndicator extends PanelMenu.Button {
 
             saveSnippets(this._extension.path, nextSnippets);
             this._extension.notify(
-                _('Snippet Picker'),
+                _('Topbar Snips'),
                 `${_('Deleted')}: ${snippet.title}`
             );
             this._reloadMenu();
         } catch (error) {
             logError(error, 'Failed to delete snippet');
             this._extension.notify(
-                _('Snippet Picker'),
+                _('Topbar Snips'),
                 `${_('Failed to delete')}: ${snippet.title}`
             );
         }
@@ -504,13 +504,13 @@ class SnippetPickerIndicator extends PanelMenu.Button {
             try {
                 const openedPath = openSnippetFile(this._extension.path);
                 this._extension.notify(
-                    _('Snippet Picker'),
+                    _('Topbar Snips'),
                     `${_('Opened')}: ${openedPath}`
                 );
             } catch (error) {
                 logError(error, 'Failed to open snippet file');
                 this._extension.notify(
-                    _('Snippet Picker'),
+                    _('Topbar Snips'),
                     `${_('Failed to open snippets.txt')}: ${snippetPath}`
                 );
             }

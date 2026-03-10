@@ -4,9 +4,9 @@
           path="/org/gnome/shell/extensions/snippet-picker/">
     <key name="toggle-picker" type="as">
       <default>[]</default>
-      <summary>Shortcut to open the snippet picker</summary>
+      <summary>Shortcut to open Topbar Snips</summary>
       <description>
-        Keyboard accelerator used to open the snippet picker and focus the
+        Keyboard accelerator used to open Topbar Snips and focus the
         search field.
       </description>
     </key>

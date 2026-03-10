@@ -116,7 +116,7 @@ export default class SnippetPickerPreferences extends ExtensionPreferences {
             keybinding.model,
             settings,
             KEYBINDING_TOGGLE_PICKER,
-            _('Open the snippet picker')
+            _('Open Topbar Snips')
         );
         main.append(keybinding.treeView);
 

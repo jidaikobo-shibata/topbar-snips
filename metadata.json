@@ -1,7 +1,7 @@
 {
   "uuid": "snippet-picker@jidaikobo.shibata",
-  "name": "Snippet Picker",
-  "description": "Pick snippets from a file in the top bar, copy them, and try to paste automatically when possible.",
+  "name": "Topbar Snips",
+  "description": "Topbar Snips lets you pick snippets from the GNOME Shell top bar, copy them, and try to paste automatically when possible.",
   "gettext-domain": "snippet-picker",
   "shell-version": ["45", "46", "47", "48"],
   "settings-schema": "org.gnome.shell.extensions.snippet-picker",
