@@ -92,7 +92,7 @@ function createKeybindingWidget(settings) {
     return {model, treeView};
 }
 
-export default class SnippetPickerPreferences extends ExtensionPreferences {
+export default class TopbarSnipsPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const _ = this.gettext.bind(this);
         const settings = this.getSettings();

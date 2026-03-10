@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist gettext-domain="snippet-picker">
-  <schema id="org.gnome.shell.extensions.snippet-picker"
-          path="/org/gnome/shell/extensions/snippet-picker/">
+<schemalist gettext-domain="topbar-snips">
+  <schema id="org.gnome.shell.extensions.topbar-snips"
+          path="/org/gnome/shell/extensions/topbar-snips/">
     <key name="toggle-picker" type="as">
       <default>[]</default>
       <summary>Shortcut to open Topbar Snips</summary>

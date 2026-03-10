@@ -403,3 +403,15 @@
   - UUID、設定 schema ID、gettext domain、拡張ディレクトリ名まで `topbar-snips` へ移行する作業は未実施。
 - 次にやるとよいこと
   - 配布前に完全リネームが必要なら、設定移行方針を決めたうえで UUID と schema 名の移行手順を別途まとめる。
+
+- 何をしたか
+  - UUID、settings schema、gettext domain、schema ファイル名、locale カタログ名、実装内のスタイルクラスを `topbar-snips` 基準へ切り替える作業に着手した。
+- なぜそうしたか
+  - 配布時に見える名前だけでなく、拡張としての識別子一式も `Topbar Snips` に揃えたかったため。
+  - 途中状態で古い識別子が残ると、後からどこまで移行済みか判断しにくくなるため。
+- 未完了の事項
+  - 実ディレクトリ名の変更と、変更後の schema/翻訳再生成、GNOME Shell からの再認識確認。
+  - 既存の旧 UUID / 旧 settings path から設定を引き継ぐ移行処理は未実装。
+- 次にやるとよいこと
+  - ディレクトリ名を `topbar-snips@jidaikobo.shibata` に変更し、`msgfmt` と `glib-compile-schemas` を再実行する。
+  - 実機で旧拡張が残留せず、新 UUID の拡張として認識されるか確認する。

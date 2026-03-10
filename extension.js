@@ -144,7 +144,7 @@ function openSnippetFile(extensionPath) {
     return snippetPath;
 }
 
-class SnippetPickerIndicator extends PanelMenu.Button {
+class TopbarSnipsIndicator extends PanelMenu.Button {
     _init(extension) {
         super._init(0.0, _('Topbar Snips'), false);
 
@@ -328,9 +328,9 @@ class SnippetPickerIndicator extends PanelMenu.Button {
     _updateSelectionHighlight() {
         for (const [index, item] of this._snippetItems.entries()) {
             if (index === this._selectedSnippetIndex) {
-                item.add_style_class_name('snippet-picker-item-selected');
+                item.add_style_class_name('topbar-snips-item-selected');
             } else {
-                item.remove_style_class_name('snippet-picker-item-selected');
+                item.remove_style_class_name('topbar-snips-item-selected');
             }
         }
     }
@@ -401,7 +401,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
 
     _appendSearchSection() {
         const entry = new St.Entry({
-            name: 'snippet-picker-search-entry',
+            name: 'topbar-snips-search-entry',
             style_class: 'search-entry',
             can_focus: true,
             hint_text: _('Search snippets...'),
@@ -576,7 +576,7 @@ class SnippetPickerIndicator extends PanelMenu.Button {
                 this._selectedSnippetIndex = index;
                 this._updateSelectionHighlight();
             });
-            item.add_style_class_name('snippet-picker-item');
+            item.add_style_class_name('topbar-snips-item');
             this._snippetItems.push(item);
             this.menu.addMenuItem(item);
         }
@@ -606,13 +606,13 @@ class SnippetPickerIndicator extends PanelMenu.Button {
     }
 }
 
-const SnippetPickerIndicatorObj = GObject.registerClass(SnippetPickerIndicator);
+const TopbarSnipsIndicatorObj = GObject.registerClass(TopbarSnipsIndicator);
 
 function createIndicator(extension) {
-    return new SnippetPickerIndicatorObj(extension);
+    return new TopbarSnipsIndicatorObj(extension);
 }
 
-export default class SnippetPickerExtension extends Extension {
+export default class TopbarSnipsExtension extends Extension {
     shouldKeepClipboardContent() {
         return this._settings?.get_boolean(KEY_KEEP_CLIPBOARD_CONTENT) ?? false;
     }
