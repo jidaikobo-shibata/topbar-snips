@@ -21,6 +21,8 @@ const CLIPBOARD_RESTORE_DELAY_MS = 80;
 const KEYBINDING_TOGGLE_PICKER = 'toggle-picker';
 const KEY_KEEP_CLIPBOARD_CONTENT = 'copy-on-activate';
 const KEY_SHOW_NOTIFICATIONS = 'show-notifications';
+const KEY_DEVELOPER_MODE = 'developer-mode';
+const KEY_USE_BUNDLED_SNIPPETS = 'use-bundled-snippets';
 
 function buildDefaultSnippetFilePath(extensionPath) {
     return GLib.build_filenamev([extensionPath, DEFAULT_SNIPPET_FILE_NAME]);
@@ -34,7 +36,11 @@ function fileExists(path) {
     return GLib.file_test(path, GLib.FileTest.EXISTS);
 }
 
-function getSnippetFilePathForRead(extensionPath) {
+function getSnippetFilePathForRead(extensionPath, useBundledSnippets = false) {
+    if (useBundledSnippets) {
+        return buildDefaultSnippetFilePath(extensionPath);
+    }
+
     const userPath = buildUserSnippetFilePath(extensionPath);
     if (fileExists(userPath)) {
         return userPath;
@@ -115,8 +121,11 @@ function serializeSnippets(snippets) {
     }).join('\n\n');
 }
 
-function loadSnippets(extensionPath) {
-    const snippetPath = getSnippetFilePathForRead(extensionPath);
+function loadSnippets(extensionPath, useBundledSnippets = false) {
+    const snippetPath = getSnippetFilePathForRead(
+        extensionPath,
+        useBundledSnippets
+    );
     const file = Gio.File.new_for_path(snippetPath);
     const [, bytes] = file.load_contents(null);
     const contents = new TextDecoder().decode(bytes);
@@ -136,6 +145,16 @@ function saveSnippets(extensionPath, snippets) {
 
 function openSnippetFile(extensionPath) {
     const snippetPath = ensureUserSnippetFile(extensionPath);
+    const file = Gio.File.new_for_path(snippetPath);
+    const uri = file.get_uri();
+
+    Gio.AppInfo.launch_default_for_uri(uri, null);
+
+    return snippetPath;
+}
+
+function openBundledSnippetFile(extensionPath) {
+    const snippetPath = buildDefaultSnippetFilePath(extensionPath);
     const file = Gio.File.new_for_path(snippetPath);
     const uri = file.get_uri();
 
@@ -518,6 +537,30 @@ class TopbarSnipsIndicator extends PanelMenu.Button {
         this.menu.addMenuItem(editItem);
         this._auxiliaryItems.push(editItem);
 
+        if (this._extension.isDeveloperModeEnabled()) {
+            const bundledEditItem = new PopupMenu.PopupMenuItem(
+                _('Open bundled snippets.txt')
+            );
+            bundledEditItem.connect('activate', () => {
+                const bundledPath = buildDefaultSnippetFilePath(this._extension.path);
+                try {
+                    const openedPath = openBundledSnippetFile(this._extension.path);
+                    this._extension.notify(
+                        _('Topbar Snips'),
+                        `${_('Opened')}: ${openedPath}`
+                    );
+                } catch (error) {
+                    logError(error, 'Failed to open bundled snippet file');
+                    this._extension.notify(
+                        _('Topbar Snips'),
+                        `${_('Failed to open snippets.txt')}: ${bundledPath}`
+                    );
+                }
+            });
+            this.menu.addMenuItem(bundledEditItem);
+            this._auxiliaryItems.push(bundledEditItem);
+        }
+
         const preferencesItem = new PopupMenu.PopupMenuItem(_('Open Preferences'));
         preferencesItem.connect('activate', () => {
             this.menu.close();
@@ -533,10 +576,14 @@ class TopbarSnipsIndicator extends PanelMenu.Button {
         this._snippetItems = [];
         this._auxiliaryItems = [];
 
-        const snippetPath = getSnippetFilePathForRead(this._extension.path);
+        const useBundledSnippets = this._extension.shouldUseBundledSnippets();
+        const snippetPath = getSnippetFilePathForRead(
+            this._extension.path,
+            useBundledSnippets
+        );
         let snippets;
         try {
-            ({snippets} = loadSnippets(this._extension.path));
+            ({snippets} = loadSnippets(this._extension.path, useBundledSnippets));
         } catch (error) {
             logError(error, 'Failed to load snippets');
             this._appendMessageItem(_('Failed to read the snippet file.'));
@@ -613,6 +660,18 @@ function createIndicator(extension) {
 }
 
 export default class TopbarSnipsExtension extends Extension {
+    isDeveloperModeEnabled() {
+        return this._settings?.get_boolean(KEY_DEVELOPER_MODE) ?? false;
+    }
+
+    shouldUseBundledSnippets() {
+        if (!this.isDeveloperModeEnabled()) {
+            return false;
+        }
+
+        return this._settings?.get_boolean(KEY_USE_BUNDLED_SNIPPETS) ?? false;
+    }
+
     shouldKeepClipboardContent() {
         return this._settings?.get_boolean(KEY_KEEP_CLIPBOARD_CONTENT) ?? false;
     }

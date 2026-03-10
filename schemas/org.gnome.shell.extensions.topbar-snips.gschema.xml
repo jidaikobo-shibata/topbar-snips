@@ -26,5 +26,22 @@
         should show desktop notifications.
       </description>
     </key>
+    <key name="developer-mode" type="b">
+      <default>false</default>
+      <summary>Enable developer-only options</summary>
+      <description>
+        Whether to expose developer-only options for working with bundled
+        snippets during extension development.
+      </description>
+    </key>
+    <key name="use-bundled-snippets" type="b">
+      <default>false</default>
+      <summary>Read bundled snippets.txt instead of snippets.local.txt</summary>
+      <description>
+        Whether the picker should read the bundled snippets.txt file instead
+        of the user-specific snippets.local.txt file. This option is meant
+        for development and testing.
+      </description>
+    </key>
   </schema>
 </schemalist>

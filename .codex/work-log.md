@@ -3,6 +3,20 @@
 ## 2026-03-10
 
 - 何をしたか
+  - GSettings に `developer-mode` と `use-bundled-snippets` を追加した。
+  - `developer-mode` が有効なときだけ、設定画面に「配布用 `snippets.txt` を picker で表示する」スイッチを出すようにした。
+  - 拡張メニューでも、開発モード時だけ `Open bundled snippets.txt` を出し、配布用ファイルを直接開けるようにした。
+- なぜそうしたか
+  - 通常運用では `snippets.local.txt` を優先したい一方で、開発時だけ配布状態の確認と編集を安全に行いたかったため。
+  - 一般ユーザーへ常時見せると誤操作につながるので、開発モードを明示的に有効化したときだけ露出する形にしたため。
+- 未完了の事項
+  - 実機で `developer-mode` を `true` にしたとき、設定画面の開発者項目とメニューの `Open bundled snippets.txt` が期待どおり出るかは未確認。
+  - `use-bundled-snippets` 切り替え直後に、拡張再読込なしで一覧表示が更新されるかは未確認。
+- 次にやるとよいこと
+  - `gsettings` で `developer-mode` を有効化し、設定画面に開発者項目が出ることを確認する。
+  - そのまま `use-bundled-snippets` を切り替えて、メニューに配布用サンプルが出るか確認する。
+
+- 何をしたか
   - GNOME Shell 拡張の最小構成として `metadata.json`、`extension.js`、`snippets.txt` を追加した。
   - 固定ファイル `snippets.txt` を `%%snippet: タイトル%%` 記法で分割して、トップバーのメニューに出す実装を入れた。
   - 候補選択時にクリップボードへコピーし、その後に `Ctrl+V` の送出を試みる処理を追加した。

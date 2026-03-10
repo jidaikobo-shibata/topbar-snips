@@ -12,6 +12,8 @@ const COLUMN_MODS = 3;
 const KEYBINDING_TOGGLE_PICKER = 'toggle-picker';
 const KEY_KEEP_CLIPBOARD_CONTENT = 'copy-on-activate';
 const KEY_SHOW_NOTIFICATIONS = 'show-notifications';
+const KEY_DEVELOPER_MODE = 'developer-mode';
+const KEY_USE_BUNDLED_SNIPPETS = 'use-bundled-snippets';
 
 function addKeybinding(model, settings, id, description) {
     const accelerators = settings.get_strv(id);
@@ -161,6 +163,24 @@ export default class TopbarSnipsPreferences extends ExtensionPreferences {
         const page = new Adw.PreferencesPage();
         page.add(keyboardGroup);
         page.add(behaviorGroup);
+
+        if (settings.get_boolean(KEY_DEVELOPER_MODE)) {
+            const developerGroup = new Adw.PreferencesGroup({
+                title: _('Developer'),
+            });
+            const bundledRow = new Adw.SwitchRow({
+                title: _('Show bundled snippets.txt in the picker'),
+                subtitle: _('Read the bundled snippets.txt instead of snippets.local.txt for development checks.'),
+            });
+            settings.bind(
+                KEY_USE_BUNDLED_SNIPPETS,
+                bundledRow,
+                'active',
+                Gio.SettingsBindFlags.DEFAULT
+            );
+            developerGroup.add(bundledRow);
+            page.add(developerGroup);
+        }
 
         window.set_default_size(560, 320);
         window.add(page);
